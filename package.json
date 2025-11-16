@@ -7,10 +7,13 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "server:dev": "ts-node ./app/server.ts",
-    "server:inspect": "set DANGEROUSLY_OMIT_AUTH=true && npx @modelcontextprotocol/inspector npm run server:dev"
+    "server:dev": "ts-nodenpm ./app/server.ts",
+    "server:inspect": "set DANGEROUSLY_OMIT_AUTH=true && npx @modelcontextprotocol/inspector npm run server:dev",
+    "server:build": "tsc -p tsconfig.server.json",
+    "server:run": "node dist/server.js"
   },
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@modelcontextprotocol/sdk": "^1.21.1",

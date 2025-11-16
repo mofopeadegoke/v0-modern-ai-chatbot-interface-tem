@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@cfworker/json-schema':
+        specifier: ^4.1.1
+        version: 4.1.1
       '@emotion/is-prop-valid':
         specifier: latest
         version: 1.4.0
@@ -16,7 +19,7 @@ importers:
         version: 3.9.1(react-hook-form@7.54.1(react@19.0.0))
       '@modelcontextprotocol/sdk':
         specifier: ^1.21.1
-        version: 1.21.1
+        version: 1.21.1(@cfworker/json-schema@4.1.1)
       '@radix-ui/react-accordion':
         specifier: 1.2.2
         version: 1.2.2(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -176,7 +179,7 @@ importers:
     devDependencies:
       '@modelcontextprotocol/inspector':
         specifier: ^0.17.2
-        version: 0.17.2(@types/node@22.0.0)(@types/react-dom@19.0.0)(@types/react@19.0.0)(typescript@5.0.2)
+        version: 0.17.2(@cfworker/json-schema@4.1.1)(@types/node@22.0.0)(@types/react-dom@19.0.0)(@types/react@19.0.0)(typescript@5.0.2)
       '@types/node':
         specifier: ^22
         version: 22.0.0
@@ -208,6 +211,9 @@ packages:
   '@babel/runtime@7.28.4':
     resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
     engines: {node: '>=6.9.0'}
+
+  '@cfworker/json-schema@4.1.1':
+    resolution: {integrity: sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2846,6 +2852,8 @@ snapshots:
 
   '@babel/runtime@7.28.4': {}
 
+  '@cfworker/json-schema@4.1.1': {}
+
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
@@ -2993,18 +3001,18 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@modelcontextprotocol/inspector-cli@0.17.2':
+  '@modelcontextprotocol/inspector-cli@0.17.2(@cfworker/json-schema@4.1.1)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.21.1
+      '@modelcontextprotocol/sdk': 1.21.1(@cfworker/json-schema@4.1.1)
       commander: 13.1.0
       spawn-rx: 5.1.2
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
 
-  '@modelcontextprotocol/inspector-client@0.17.2(@types/react-dom@19.0.0)(@types/react@19.0.0)':
+  '@modelcontextprotocol/inspector-client@0.17.2(@cfworker/json-schema@4.1.1)(@types/react-dom@19.0.0)(@types/react@19.0.0)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.21.1
+      '@modelcontextprotocol/sdk': 1.21.1(@cfworker/json-schema@4.1.1)
       '@radix-ui/react-checkbox': 1.3.3(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog': 1.1.4(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-icons': 1.3.2(react@18.3.1)
@@ -3035,9 +3043,9 @@ snapshots:
       - '@types/react-dom'
       - supports-color
 
-  '@modelcontextprotocol/inspector-server@0.17.2':
+  '@modelcontextprotocol/inspector-server@0.17.2(@cfworker/json-schema@4.1.1)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.21.1
+      '@modelcontextprotocol/sdk': 1.21.1(@cfworker/json-schema@4.1.1)
       cors: 2.8.5
       express: 5.1.0
       shell-quote: 1.8.3
@@ -3050,12 +3058,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@modelcontextprotocol/inspector@0.17.2(@types/node@22.0.0)(@types/react-dom@19.0.0)(@types/react@19.0.0)(typescript@5.0.2)':
+  '@modelcontextprotocol/inspector@0.17.2(@cfworker/json-schema@4.1.1)(@types/node@22.0.0)(@types/react-dom@19.0.0)(@types/react@19.0.0)(typescript@5.0.2)':
     dependencies:
-      '@modelcontextprotocol/inspector-cli': 0.17.2
-      '@modelcontextprotocol/inspector-client': 0.17.2(@types/react-dom@19.0.0)(@types/react@19.0.0)
-      '@modelcontextprotocol/inspector-server': 0.17.2
-      '@modelcontextprotocol/sdk': 1.21.1
+      '@modelcontextprotocol/inspector-cli': 0.17.2(@cfworker/json-schema@4.1.1)
+      '@modelcontextprotocol/inspector-client': 0.17.2(@cfworker/json-schema@4.1.1)(@types/react-dom@19.0.0)(@types/react@19.0.0)
+      '@modelcontextprotocol/inspector-server': 0.17.2(@cfworker/json-schema@4.1.1)
+      '@modelcontextprotocol/sdk': 1.21.1(@cfworker/json-schema@4.1.1)
       concurrently: 9.2.1
       node-fetch: 3.3.2
       open: 10.2.0
@@ -3075,7 +3083,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@modelcontextprotocol/sdk@1.21.1':
+  '@modelcontextprotocol/sdk@1.21.1(@cfworker/json-schema@4.1.1)':
     dependencies:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -3090,6 +3098,8 @@ snapshots:
       raw-body: 3.0.1
       zod: 3.24.1
       zod-to-json-schema: 3.24.6(zod@3.24.1)
+    optionalDependencies:
+      '@cfworker/json-schema': 4.1.1
     transitivePeerDependencies:
       - supports-color
 
