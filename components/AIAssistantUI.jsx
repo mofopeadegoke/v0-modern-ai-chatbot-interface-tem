@@ -154,54 +154,25 @@ export default function AIAssistantUI() {
     setFolders((prev) => [...prev, { id: Math.random().toString(36).slice(2), name }])
   }
 
-  function sendMessage(convId, content) {
-    if (!content.trim()) return
+  // sendMessage now accepts optional role (default "user")
+  function sendMessage(convId, content, role = "user") {
+    if (!content || !String(content).trim()) return
     const now = new Date().toISOString()
-    const userMsg = { id: Math.random().toString(36).slice(2), role: "user", content, createdAt: now }
+    const msg = { id: Math.random().toString(36).slice(2), role, content, createdAt: now }
 
     setConversations((prev) =>
       prev.map((c) => {
         if (c.id !== convId) return c
-        const msgs = [...(c.messages || []), userMsg]
+        const msgs = [...(c.messages || []), msg]
         return {
           ...c,
           messages: msgs,
           updatedAt: now,
           messageCount: msgs.length,
-          preview: content.slice(0, 80),
+          preview: String(content).slice(0, 80),
         }
       }),
     )
-
-    setIsThinking(true)
-    setThinkingConvId(convId)
-
-    const currentConvId = convId
-    setTimeout(() => {
-      // Always clear thinking state and generate response for this specific conversation
-      setIsThinking(false)
-      setThinkingConvId(null)
-      setConversations((prev) =>
-        prev.map((c) => {
-          if (c.id !== currentConvId) return c
-          const ack = `Got it — I'll help with that.`
-          const asstMsg = {
-            id: Math.random().toString(36).slice(2),
-            role: "assistant",
-            content: ack,
-            createdAt: new Date().toISOString(),
-          }
-          const msgs = [...(c.messages || []), asstMsg]
-          return {
-            ...c,
-            messages: msgs,
-            updatedAt: new Date().toISOString(),
-            messageCount: msgs.length,
-            preview: asstMsg.content.slice(0, 80),
-          }
-        }),
-      )
-    }, 2000)
   }
 
   function editMessage(convId, messageId, newContent) {
@@ -244,6 +215,34 @@ export default function AIAssistantUI() {
   const composerRef = useRef(null)
 
   const selected = conversations.find((c) => c.id === selectedId) || null
+
+  // Minimal helper to call your server route at /api/mcp
+  async function queryAI(content) {
+    setIsThinking(true)
+    setThinkingConvId(selected?.id ?? null)
+
+    try {
+      const res = await fetch("/api/mcp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: content }),
+      })
+
+      const data = await res.json()
+      // route should return { result: "..." } or { error: "..." }
+      if (!res.ok) {
+        console.error("AI API error:", data)
+        return data?.error || "AI returned an error"
+      }
+      return data?.result ?? "No response from AI"
+    } catch (err) {
+      console.error("Failed to call AI route:", err)
+      return "Failed to get AI response"
+    } finally {
+      setIsThinking(false)
+      setThinkingConvId(null)
+    }
+  }
 
   return (
     <div className="h-screen w-full bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
@@ -298,9 +297,32 @@ export default function AIAssistantUI() {
           <ChatPane
             ref={composerRef}
             conversation={selected}
-            onSend={(content) => selected && sendMessage(selected.id, content)}
-            onEditMessage={(messageId, newContent) => selected && editMessage(selected.id, messageId, newContent)}
-            onResendMessage={(messageId) => selected && resendMessage(selected.id, messageId)}
+            onSend={async (content) => {
+              if (!selected) return
+
+              // 1. save user message
+              sendMessage(selected.id, content, "user")
+
+              // 2. show thinking animation
+              setIsThinking(true)
+              setThinkingConvId(selected.id)
+
+              // 3. call server route for AI response
+              const aiReply = await queryAI(content)
+
+              // 4. save assistant response
+              sendMessage(selected.id, aiReply, "assistant")
+
+              // 5. clear thinking (queryAI also clears it but keep safe)
+              setIsThinking(false)
+              setThinkingConvId(null)
+            }}
+            onEditMessage={(messageId, newContent) =>
+              selected && editMessage(selected.id, messageId, newContent)
+            }
+            onResendMessage={(messageId) =>
+              selected && resendMessage(selected.id, messageId)
+            }
             isThinking={isThinking && thinkingConvId === selected?.id}
             onPauseThinking={pauseThinking}
           />

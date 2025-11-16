@@ -28,29 +28,41 @@ function ThinkingMessage({ onPause }) {
 }
 
 const ChatPane = forwardRef(function ChatPane(
-  { conversation, onSend, onEditMessage, onResendMessage, isThinking, onPauseThinking },
-  ref,
+  {
+    conversation,
+    onSend,           // <-- parent handles AI
+    onEditMessage,
+    onResendMessage,
+    isThinking,
+    onPauseThinking,
+  },
+  ref
 ) {
   const [editingId, setEditingId] = useState(null)
   const [draft, setDraft] = useState("")
   const [busy, setBusy] = useState(false)
   const composerRef = useRef(null)
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      insertTemplate: (templateContent) => {
-        composerRef.current?.insertTemplate(templateContent)
-      },
-    }),
-    [],
-  )
+  useImperativeHandle(ref, () => ({
+    insertTemplate: (content) => {
+      composerRef.current?.insertTemplate(content)
+    },
+  }))
 
   if (!conversation) return null
 
-  const tags = ["Certified", "Personalized", "Experienced", "Helpful"]
   const messages = Array.isArray(conversation.messages) ? conversation.messages : []
-  const count = messages.length || conversation.messageCount || 0
+  const count = messages.length
+
+  async function handleSend(text) {
+    if (!text.trim()) return
+    setBusy(true)
+
+    // parent completely controls AI
+    await onSend(text)
+
+    setBusy(false)
+  }
 
   function startEdit(m) {
     setEditingId(m.id)
@@ -76,21 +88,13 @@ const ChatPane = forwardRef(function ChatPane(
     <div className="flex h-full min-h-0 flex-1 flex-col">
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-6 sm:px-8">
         <div className="mb-2 text-3xl font-serif tracking-tight sm:text-4xl md:text-5xl">
-          <span className="block leading-[1.05] font-sans text-2xl">{conversation.title}</span>
-        </div>
-        <div className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
-          Updated {timeAgo(conversation.updatedAt)} · {count} messages
+          <span className="block leading-[1.05] font-sans text-2xl">
+            {conversation.title}
+          </span>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2 border-b border-zinc-200 pb-5 dark:border-zinc-800">
-          {tags.map((t) => (
-            <span
-              key={t}
-              className="inline-flex items-center rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-700 dark:border-zinc-800 dark:text-zinc-200"
-            >
-              {t}
-            </span>
-          ))}
+        <div className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+          Updated {timeAgo(conversation.updatedAt)} · {count} messages
         </div>
 
         {messages.length === 0 ? (
@@ -102,7 +106,7 @@ const ChatPane = forwardRef(function ChatPane(
             {messages.map((m) => (
               <div key={m.id} className="space-y-2">
                 {editingId === m.id ? (
-                  <div className={cls("rounded-2xl border p-2", "border-zinc-200 dark:border-zinc-800")}>
+                  <div className="rounded-2xl border p-2 border-zinc-200 dark:border-zinc-800">
                     <textarea
                       value={draft}
                       onChange={(e) => setDraft(e.target.value)}
@@ -133,9 +137,13 @@ const ChatPane = forwardRef(function ChatPane(
                 ) : (
                   <Message role={m.role}>
                     <div className="whitespace-pre-wrap">{m.content}</div>
+
                     {m.role === "user" && (
                       <div className="mt-1 flex gap-2 text-[11px] text-zinc-500">
-                        <button className="inline-flex items-center gap-1 hover:underline" onClick={() => startEdit(m)}>
+                        <button
+                          className="inline-flex items-center gap-1 hover:underline"
+                          onClick={() => startEdit(m)}
+                        >
                           <Pencil className="h-3.5 w-3.5" /> Edit
                         </button>
                         <button
@@ -150,21 +158,13 @@ const ChatPane = forwardRef(function ChatPane(
                 )}
               </div>
             ))}
+
             {isThinking && <ThinkingMessage onPause={onPauseThinking} />}
           </>
         )}
       </div>
 
-      <Composer
-        ref={composerRef}
-        onSend={async (text) => {
-          if (!text.trim()) return
-          setBusy(true)
-          await onSend?.(text)
-          setBusy(false)
-        }}
-        busy={busy}
-      />
+      <Composer ref={composerRef} onSend={handleSend} busy={busy} />
     </div>
   )
 })
