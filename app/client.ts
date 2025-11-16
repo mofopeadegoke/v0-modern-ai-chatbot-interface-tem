@@ -1,7 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { Tool } from '@modelcontextprotocol/sdk/types.js'
-import { deepseek } from '@ai-sdk/deepseek';
+import {createGoogleGenerativeAI} from '@ai-sdk/google'
 import {generateText, jsonSchema, tool, ToolSet} from 'ai'
 
 
@@ -25,6 +25,10 @@ async function getTools() {
     return tools
 }
 
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.API_KEY,
+})
+
 async function main() {
     await mcp.connect(transport)
     const [tools, prompts, resources, resourceTemplates] = await Promise.all([
@@ -38,7 +42,7 @@ async function main() {
 export async function handleQuery(query: string) {
     const tools = await getTools();
   const { text, toolResults } = await generateText({
-    model: deepseek("deepseek-chat"),
+    model: google("gemini-2.0-flash"),
     prompt: query,
     tools: tools.reduce(
       (obj, t) => ({
