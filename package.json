@@ -7,7 +7,7 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "server:dev": "ts-nodenpm ./app/server.ts",
+    "server:dev": "npx ts-node ./app/server.ts",
     "server:inspect": "set DANGEROUSLY_OMIT_AUTH=true && npx @modelcontextprotocol/inspector npm run server:dev",
     "server:build": "tsc -p tsconfig.server.json",
     "server:run": "node dist/server.js"
@@ -71,7 +71,9 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "zod-openapi": "^5.4.3",
+    "zod3": "npm:zod@^3.25.76"
   },
   "devDependencies": {
     "@modelcontextprotocol/inspector": "^0.17.2",

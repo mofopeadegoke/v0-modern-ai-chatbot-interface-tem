@@ -62,6 +62,7 @@ export async function handleQuery(query: string) {
     ),
   })
 
+  console.log(toolResults);
   // @ts-expect-error
   return text || toolResults?.[0]?.result?.content?.[0]?.text || "No text generated.";
 }

@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await handleQuery(query);
+    console.log("Generated result:", result);
     return NextResponse.json({ result });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to generate response" }, { status: 500 });
