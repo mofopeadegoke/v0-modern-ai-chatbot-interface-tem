@@ -73,6 +73,7 @@ When using tools:
       return obj
     }, {} as ToolSet),
   })
+  // log outputs for debugging
 
   console.log("🧪 toolResults:", toolResults)
   console.log("📝 text from model:", text)
