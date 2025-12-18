@@ -38,21 +38,21 @@ const google = createGoogleGenerativeAI({
   apiKey: process.env.API_KEY,
 })
 
-// client.ts (only changed parts shown — drop into your existing file)
 export async function handleQuery(query: string) {
   await ensureMcpReady()
 
   const tools = await getTools()
 
-  // === Master prompt wrapper (Fix 3) ===
+  // Enhanced prompt that encourages the model to answer directly when possible
   const masterPrompt = `
 ${query}
 
-When using tools:
-- Interpret JSON results returned by tools.
-- Convert any structured JSON results into a clean, human-readable paragraph (or a few short paragraphs).
-- Never return raw JSON unless explicitly asked to do so.
-- If you call a tool and it returns data, produce a short summary explaining the key points and any recommended next steps.
+Guidelines:
+- Answer the question directly using your own knowledge whenever possible.
+- Only use the available tools if the query specifically requires external data, actions, or capabilities you don't have.
+- When you do use tools, interpret their JSON results and convert them into clean, human-readable paragraphs.
+- Never return raw JSON unless explicitly asked.
+- If a tool returns data, provide a concise summary with key points and any recommended next steps.
   `.trim()
 
   const { text, toolResults } = await generateText({
@@ -72,20 +72,18 @@ When using tools:
       })
       return obj
     }, {} as ToolSet),
+    
   })
-  // log outputs for debugging
 
   console.log("🧪 toolResults:", toolResults)
   console.log("📝 text from model:", text)
 
-  // If the model already returned nice text, use it.
+  // If the model returned text (whether it used tools or not), return it
   if (text && String(text).trim()) {
     return text
   }
 
-  // Fallback: maybe the model left output in toolResults (raw JSON). Convert that into a readable string.
-  // We'll call the model again with the tool result JSON and ask it to format it nicely.
-  // This is a short helper fallback — keep it only for debugging/robustness.
+  // Fallback: Handle case where model used tools but didn't format the output
   const firstToolOutput =
     toolResults?.[0]?.output?.content?.[0]?.text ||
     toolResults?.[0]?.output ||
@@ -93,7 +91,7 @@ When using tools:
 
   if (firstToolOutput) {
     const formatPrompt = `
-I was given the following tool output (likely JSON or structured data). Please convert it into a short, clear, human-readable explanation in paragraph form. Do NOT return raw JSON. If some fields look like identifiers, explain them briefly.
+I received the following tool output. Please convert it into a short, clear, human-readable explanation in paragraph form. Do NOT return raw JSON. Explain the key information concisely.
 
 Tool output:
 ${typeof firstToolOutput === "string" ? firstToolOutput : JSON.stringify(firstToolOutput, null, 2)}
@@ -104,17 +102,16 @@ ${typeof firstToolOutput === "string" ? firstToolOutput : JSON.stringify(firstTo
         model: google("gemini-2.0-flash"),
         prompt: formatPrompt,
       })
-      // formatted.text might hold the nicely formatted output
       
       return formatted.text || formatted
     } catch (e) {
       console.error("Formatting fallback failed:", e)
-      // last resort: return the raw tool output as a string
-      return typeof firstToolOutput === "string" ? firstToolOutput : JSON.stringify(firstToolOutput)
+      return typeof firstToolOutput === "string" 
+        ? firstToolOutput 
+        : JSON.stringify(firstToolOutput, null, 2)
     }
   }
 
-  // final fallback
-  return "No text generated."
+  // Final fallback
+  return "No response generated."
 }
-
