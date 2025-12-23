@@ -78,7 +78,7 @@ Guidelines:
   console.log("🧪 toolResults:", toolResults)
   console.log("📝 text from model:", text)
 
-  // If the model returned text (whether it used tools or not), return it
+  // If the model returned text (whether it used tools or not), return it.
   if (text && String(text).trim()) {
     return text
   }
